@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account Finder</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #282424;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    img#logo {
+        width: 500px; /* Adjust width as needed */
+        height: auto; /* Maintain aspect ratio */
+    }
+
+    p.subtitle {
+        font-size: 12px;
+        margin-bottom: 5px;
+        color: #ffffff;
+    }
+
+    button {
+        margin: 3px;
+        padding: 3px 8px;
+        font-size: 12px;
+        cursor: pointer;
+        border: none;
+        border-radius: 3px;
+        background-color: #ff1111;
+        color: #fff;
+        transition: background-color 0.3s;
+    }
+
+    button:hover {
+        background-color: #A71111;
+    }
+
+    #randomName {
+        font-size: 14px;
+        margin-top: 10px;
+        color: #ffffff;
+    }
+
+    input[type="text"] {
+        width: 80%;
+        padding: 5px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        font-size: 12px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        box-sizing: border-box;
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    iframe {
+        margin: 10px;
+        border: none; /* Remove border */
+        width: calc(100% - 20px);
+        height: 500px; /* Fixed initial height */
+        loading: lazy; /* Lazy loading */
+    }
+
+    .refresh-text {
+        margin-top: 10px;
+        font-size: 12px;
+        color: #ffffff;
+    }
+
+    /* Style for dropdown menu */
+    select {
+        margin: 3px;
+        padding: 3px 8px;
+        font-size: 12px;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        background-color: #fff;
+        color: #000;
+        transition: background-color 0.3s;
+    }
+
+    select:hover {
+        background-color: #e6e6e6;
+    }
+</style>
+</head>
+<body>
+
+<img id="logo" src="https://www.hanooz.pub/wp-content/uploads/2024/02/perfectposter-2.png" alt="Account Finder">
+
+<p class="subtitle">http://tinyurl.com/jelarmethod for the discord</p>
+
+<input type="text" id="searchKeyword" placeholder="Account must include...">
+
+<input type="text" id="minCharacterCount" placeholder="Enter minimum character count (e.g., 8 or 8+)">
+
+<!-- Dropdown menu for selecting account lists -->
+<div class="button-container">
+    <button onclick="pickRandomName()">Pick Random Account</button>
+    <select id="accountListDropdown">
+        <option value="4hatownerpart1.txt,4hatownerpart2.txt,4hatownerpart3.txt,4hatownerpart4.txt,4hatownerpart5.txt,4hatownerpart6.txt,4hatownerpart7.txt,4hatownerpart8.txt,4hatownerpart9.txt,4hatownerpart10.txt,4hatownerpart11.txt,4hatownerpart12.txt,4hatownerpart13.txt,4hatownerpart14.txt,4hatownerpart15.txt,4hatownerpart16.txt,4hatownerpart17.txt,4hatownerpart18.txt,4hatownerpart19.txt,4hatownerpart20.txt">4+ Hat Owners</option>
+        <option value="list5.txt">Diamond Head Owners</option>
+        <option value="list2.txt">Epic Face Owners</option>
+        <option value="list4.txt">Epic Vampire Face Owners</option>
+        <option value="list8.txt">Evil Duck Owners</option>
+        <option value="list6.txt">Hex Head Owners</option>
+        <option value="list1.txt">Ibot Owners</option>
+        <option value="legitlistpart1.txt,legitlistpart2.txt,legitlistpart3.txt,legitlistpart4.txt">Legit Fedora Owners</option>
+        <option value="list3.txt">Perfection Head Owners</option>
+    </select>
+</div>
+
+<p id="randomName"></p>
+<p class="refresh-text">The page below uses rblx.trade and its usually slow as fuck with profiles so if it doesn't show under these words dont be shocked</p>
+<iframe id="generatedIframe" src="" frameborder="0" width="100%" height="500" loading="lazy"></iframe>
+
+<script>
+    async function pickRandomName() {
+        let searchKeyword = document.getElementById('searchKeyword').value.toLowerCase();
+        const minCharacterCountInput = document.getElementById('minCharacterCount').value.trim();
+        let minCharacters = null;
+        
+        if (minCharacterCountInput && minCharacterCountInput.includes('+')) {
+            const minCharacterCountStr = minCharacterCountInput.split('+')[0];
+            minCharacters = parseInt(minCharacterCountStr);
+        } else if (minCharacterCountInput) {
+            minCharacters = parseInt(minCharacterCountInput);
+        }
+
+        try {
+            const selectedList = document.getElementById('accountListDropdown').value;
+            const listFiles = selectedList.split(',');
+
+            // Randomly select a file from the list
+            const randomFile = listFiles[Math.floor(Math.random() * listFiles.length)];
+
+            const response = await fetch(randomFile);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch ${randomFile}`);
+            }
+            const text = await response.text();
+            const names = text.trim().split('\n');
+
+            // Filter names based on search keyword and minimum characters
+            const filteredNames = names.filter(name => {
+                const lowerCaseName = name.toLowerCase();
+                return lowerCaseName.includes(searchKeyword) &&
+                    (minCharacters === null || (minCharacterCountInput.includes('+') ?
+                        lowerCaseName.length >= minCharacters :
+                        lowerCaseName.length === minCharacters));
+            });
+
+            if (filteredNames.length === 0) {
+                document.getElementById('randomName').textContent = "No matching names found.";
+                document.getElementById('generatedIframe').src = "";
+            } else {
+                const randomName = filteredNames[Math.floor(Math.random() * filteredNames.length)];
+                document.getElementById('randomName').textContent = randomName;
+                const iframeSrc = `https://rblx.trade/p/${encodeURIComponent(randomName)}`;
+                document.getElementById('generatedIframe').src = iframeSrc;
+            }
+        } catch (error) {
+            console.error('There was a problem fetching the list:', error);
+        }
+    }
+</script>
+
+</body>
+</html>
