@@ -344,7 +344,7 @@ function stopDrag() {
 
 // Function to change the background image
 function changeBackground() {
-  const imageUrl = prompt("Enter the URL of an image to change the wallpaper to that image");
+  const imageUrl = prompt("Enter the URL of an image to change the wallpaper to that image or press OK for the default one");
   if (imageUrl === "") {
     document.getElementById('background').style.backgroundImage = `url(${DEFAULT_BACKGROUND_URL})`;
     localStorage.removeItem('backgroundImageUrl'); // Remove saved URL if empty
