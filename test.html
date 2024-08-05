@@ -8,7 +8,7 @@
 <style>
 /* Styles for the background */
 .background {
-  background-image: url('https://i.postimg.cc/26mbdr0S/Untitled-drawing-1.png');
+  background-image: url('https://i.postimg.cc/26mbdr0S/Untitled-drawing-1.png'); /* Default wallpaper */
   background-size: cover;
   position: fixed;
   top: 0;
@@ -79,12 +79,11 @@
 }
 
 /* Styles for iframe */
-#iframe-container {
+.iframe-container {
   position: fixed;
   display: none;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) scale(0); /* Initially scale down */
   width: 600px;
   height: 400px;
   z-index: 1000;
@@ -92,25 +91,22 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   border-radius: 5px;
   overflow: hidden;
+  transform: translate(-50%, -50%); /* Centered without scaling */
 }
 
-#iframe-container.fullscreen {
+.iframe-container.fullscreen {
   width: 100vw;
   height: 100vh;
   top: 0;
   left: 0;
-  transform: translate(0, 0);
-  margin: 0; /* Reset margin */
-  padding: 0; /* Reset padding */
-  box-sizing: border-box; /* Include padding and border in the element's size */
+  transform: none; /* Remove transform for fullscreen */
 }
 
-#iframe-container.show {
+.iframe-container.show {
   display: block;
-  transform: translate(-50%, -50%) scale(1); /* Scale up when shown */
 }
 
-#iframe-container .header {
+.iframe-container .header {
   background-color: #212121; /* Updated header color */
   border-bottom: 1px solid #ccc;
   padding: 8px 12px;
@@ -120,17 +116,17 @@
   cursor: move;
 }
 
-#iframe-container .header .title {
+.iframe-container .header .title {
   margin: 0;
   color: white; /* Set text color to white */
 }
 
-#iframe-container .buttons {
+.iframe-container .buttons {
   display: flex;
   align-items: center;
 }
 
-#iframe-container .buttons button {
+.iframe-container .buttons button {
   background-color: #ccc;
   border: none;
   color: #555;
@@ -140,11 +136,11 @@
   cursor: pointer;
 }
 
-#iframe-container .buttons button:hover {
+.iframe-container .buttons button:hover {
   background-color: #bbb;
 }
 
-#iframe-container iframe {
+.iframe-container iframe {
   width: 100%;
   height: calc(100% - 30px); /* Subtract header height */
   border: none; /* Remove iframe border */
@@ -164,62 +160,113 @@
   width: 100px !important;
   height: 60px !important;
 }
+
+/* Styles for the context menu */
+.context-menu {
+  position: absolute;
+  display: none;
+  background: #333;
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  z-index: 1001; /* Ensure it's above other content */
+}
+
+.context-menu a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  transition: background-color 0.3s;
+}
+
+.context-menu a:hover {
+  background-color: #444;
+}
 </style>
 </head>
 <body>
 
-<div class="background"></div>
+<div class="background" id="background"></div>
 
 <div class="taskbar">
   <ul class="task-icons">
-    <li><a href="#" onclick="openWebsite('https://mathsspot.com')"><img src="" alt=""></a></li>
+    <li><a href="#" onclick="openWebsite('https://p0pgames.github.io/123/games.html')"><img src="https://i.postimg.cc/434tL4Nn/Untitled-drawing-3.png" alt="ChatBot"></a></li>
     <li><a href="#" onclick="openWebsite('https://google.com')"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Google_Chrome_icon_%28February_2022%29.svg/2048px-Google_Chrome_icon_%28February_2022%29.svg.png" alt="Chrome"></a></li>
-    <li><a href="#" onclick="openWebsite('https://oncoursemail.github.io/omit/')"><img src="" alt=""></a></li>
+    <li><a href="#" onclick="openWebsite('https://www.chatbase.co/chatbot-iframe/30eyvXUrhY1lKlsxdnUHJ')"><img src="https://i.postimg.cc/65RdT1m6/Untitled-drawing-2.png" alt="ChatBot"></a></li>
     <!-- Add more icons as needed -->
   </ul>
 </div>
 
-<!-- Iframe container -->
-<div id="iframe-container">
-  <div class="header">
-    <h3 class="title">Ｕｎｂｌｏｃｋｅｄ．ｅｘｅ</h3>
-    <div class="buttons">
-      <button onclick="toggleFullscreen()" style="background: none; border: none;"><img src="https://i.ibb.co/qNcVXJY/Untitled-drawing-4.png" alt="Fullscreen" width="20" height="20"></button>
-      <span class="close-button" onclick="closeIframe()"><img src="https://i.ibb.co/0Xqf1CS/Untitled-drawing-3.png" class="close-icon" alt="Close"></span>
-    </div>
-  </div>
-  <iframe id="embedded-iframe" src="" frameborder="0"></iframe>
+<!-- Context Menu -->
+<div id="context-menu" class="context-menu">
+  <a href="#" onclick="changeBackground(); return false;">Change Background</a>
+  <!-- Add more menu items here if needed -->
 </div>
 
+<!-- Iframe container template -->
+<template id="iframe-template">
+  <div class="iframe-container" onclick="bringToFront(this)">
+    <div class="header">
+      <h3 class="title">Ｕｎｂｌｏｃｋｅｄ．ｅｘｅ</h3>
+      <div class="buttons">
+        <button onclick="toggleFullscreen(this.parentElement.parentElement.parentElement)" style="background: none; border: none;"><img src="https://i.ibb.co/qNcVXJY/Untitled-drawing-4.png" alt="Fullscreen" width="20" height="20"></button>
+        <span class="close-button" onclick="closeIframe(this.parentElement.parentElement.parentElement)"><img src="https://i.ibb.co/0Xqf1CS/Untitled-drawing-3.png" class="close-icon" alt="Close"></span>
+      </div>
+    </div>
+    <iframe src="" frameborder="0"></iframe>
+  </div>
+</template>
+
 <script>
+const DEFAULT_BACKGROUND_URL = 'https://i.postimg.cc/26mbdr0S/Untitled-drawing-1.png'; // Default wallpaper
+
+let zIndexCounter = 1000; // Initialize a zIndex counter
+
+// Load background image from local storage
+function loadBackgroundImage() {
+  const savedImageUrl = localStorage.getItem('backgroundImageUrl');
+  document.getElementById('background').style.backgroundImage = savedImageUrl ? `url(${savedImageUrl})` : `url(${DEFAULT_BACKGROUND_URL})`;
+}
+
 // Function to open website in iframe
 function openWebsite(url) {
-  var iframe = document.getElementById('embedded-iframe');
-  var iframeContainer = document.getElementById('iframe-container');
+  const iframeTemplate = document.getElementById('iframe-template').content.cloneNode(true);
+  const iframe = iframeTemplate.querySelector('iframe');
+  const iframeContainer = iframeTemplate.querySelector('.iframe-container');
+
   iframe.src = url;
-  iframeContainer.classList.add('show'); // Add class to show iframe with animation
-  
+  iframeContainer.classList.add('show'); // Add class to show iframe
+  document.body.appendChild(iframeContainer);
+
+  // Set the zIndex and increment the counter
+  iframeContainer.style.zIndex = ++zIndexCounter;
+
   // Send initial URL to Discord
   logToDiscord(url);
 
   // Listen for changes in the iframe src attribute
-  var observer = new MutationObserver(function(mutations) {
+  const observer = new MutationObserver(function(mutations) {
     mutations.forEach(function(mutation) {
-      if (mutation.attributeName === "src") {
-        var currentUrl = mutation.target.src;
-        logToDiscord(currentUrl);
+      if (mutation.attributeName === 'src') {
+        logToDiscord(iframe.src);
       }
     });
   });
 
   observer.observe(iframe, { attributes: true });
+}
 
+// Function to bring the iframe container to the front
+function bringToFront(iframeContainer) {
+  iframeContainer.style.zIndex = ++zIndexCounter;
 }
 
 // Function to send URL change to Discord
 function logToDiscord(url) {
-  var webhookUrl = "https://discord.com/api/webhooks/1224202517676556398/ezit5AANhDMPqAXoaYkYRCQaLMb54UE9eMv1Uy8_h3rvtJ0d08NViDsSHZOQAH-i2RlN";
-  var payload = {
+  const webhookUrl = "https://discord.com/api/webhooks/1266862077243424898/pnLSenNvqmPsylQ6Fn0p8_SJds_HfCIV0g4lMMDW--M4oXvHQOjptG3X2CgXvf8vkIme";
+  const payload = {
     content: `Iframe opened with URL: ${url}`
   };
 
@@ -234,52 +281,46 @@ function logToDiscord(url) {
   .catch(error => console.error("Failed to send Discord webhook", error));
 }
 
-// Your other JavaScript functions here, including the fullscreen toggle and close iframe
-
 // Function to toggle fullscreen
-function toggleFullscreen() {
-  var iframeContainer = document.getElementById('iframe-container');
-  var embeddedIframe = document.getElementById('embedded-iframe');
-  var headerHeight = document.querySelector('.header').offsetHeight;
+function toggleFullscreen(iframeContainer) {
   if (!iframeContainer.classList.contains('fullscreen')) {
+    // Center the iframe container
+    iframeContainer.style.top = '50%';
+    iframeContainer.style.left = '50%';
+    iframeContainer.style.transform = 'translate(-50%, -50%)';
     iframeContainer.classList.add('fullscreen');
-    iframeContainer.style.width = "100vw";
-    iframeContainer.style.height = "100vh";
-    iframeContainer.style.top = "0";
-    iframeContainer.style.left = "0";
-    iframeContainer.style.transform = "none";
-    embeddedIframe.style.height = "calc(100vh - " + headerHeight + "px)";
   } else {
     iframeContainer.classList.remove('fullscreen');
-    iframeContainer.style.width = "600px";
-    iframeContainer.style.height = "400px";
-    iframeContainer.style.top = "50%";
-    iframeContainer.style.left = "50%";
-    iframeContainer.style.transform = "translate(-50%, -50%)";
-    embeddedIframe.style.height = "calc(100% - 30px)";
+    iframeContainer.style.transform = 'translate(-50%, -50%)'; // Reset transform for non-fullscreen
   }
+  // Adjust iframe height for fullscreen
+  const embeddedIframe = iframeContainer.querySelector('iframe');
+  const headerHeight = iframeContainer.querySelector('.header').offsetHeight;
+  embeddedIframe.style.height = iframeContainer.classList.contains('fullscreen') ? "calc(100vh - " + headerHeight + "px)" : "calc(100% - 30px)";
 }
 
 // Function to close iframe
-function closeIframe() {
-  var iframe = document.getElementById('embedded-iframe');
-  var iframeContainer = document.getElementById('iframe-container');
-  iframe.src = '';
-  iframeContainer.classList.remove('show'); // Remove class to hide iframe with animation
+function closeIframe(iframeContainer) {
+  document.body.removeChild(iframeContainer);
 }
 
 // Make the iframe draggable
-const header = document.querySelector('.header');
-const iframeContainer = document.getElementById('iframe-container');
-let offsetX, offsetY, isDragging = false;
+document.addEventListener('mousedown', function(e) {
+  if (e.target.closest('.header')) {
+    startDrag(e);
+  }
+});
 
-header.addEventListener('mousedown', startDrag);
+let offsetX, offsetY, isDragging = false;
+let currentIframeContainer;
 
 function startDrag(e) {
   e.preventDefault();
   isDragging = true;
-  offsetX = e.clientX - iframeContainer.offsetLeft;
-  offsetY = e.clientY - iframeContainer.offsetTop;
+  currentIframeContainer = e.target.closest('.iframe-container');
+  bringToFront(currentIframeContainer); // Bring to front when dragging
+  offsetX = e.clientX - currentIframeContainer.offsetLeft;
+  offsetY = e.clientY - currentIframeContainer.offsetTop;
 
   document.addEventListener('mousemove', dragIframe);
   document.addEventListener('mouseup', stopDrag);
@@ -288,11 +329,11 @@ function startDrag(e) {
 function dragIframe(e) {
   if (!isDragging) return;
 
-  let newX = e.clientX - offsetX;
-  let newY = e.clientY - offsetY;
+  const newX = e.clientX - offsetX;
+  const newY = e.clientY - offsetY;
 
-  iframeContainer.style.left = newX + 'px';
-  iframeContainer.style.top = newY + 'px';
+  currentIframeContainer.style.left = newX + 'px';
+  currentIframeContainer.style.top = newY + 'px';
 }
 
 function stopDrag() {
@@ -300,6 +341,41 @@ function stopDrag() {
   document.removeEventListener('mousemove', dragIframe);
   document.removeEventListener('mouseup', stopDrag);
 }
+
+// Function to change the background image
+function changeBackground() {
+  const imageUrl = prompt("Enter the URL of an image to change the wallpaper to that image");
+  if (imageUrl === "") {
+    document.getElementById('background').style.backgroundImage = `url(${DEFAULT_BACKGROUND_URL})`;
+    localStorage.removeItem('backgroundImageUrl'); // Remove saved URL if empty
+  } else if (imageUrl) {
+    document.getElementById('background').style.backgroundImage = `url(${imageUrl})`;
+    localStorage.setItem('backgroundImageUrl', imageUrl); // Save to local storage
+  }
+  // Hide context menu after action
+  document.getElementById('context-menu').style.display = 'none';
+}
+
+// Show context menu on right-click
+document.getElementById('background').addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+  const contextMenu = document.getElementById('context-menu');
+  contextMenu.style.top = `${e.clientY}px`;
+  contextMenu.style.left = `${e.clientX}px`;
+  contextMenu.style.display = 'block';
+});
+
+// Hide context menu on click elsewhere
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#context-menu')) {
+    document.getElementById('context-menu').style.display = 'none';
+  }
+});
+
+// Load the saved background image when the page loads
+window.onload = function() {
+  loadBackgroundImage();
+};
 </script>
 
 </body>
